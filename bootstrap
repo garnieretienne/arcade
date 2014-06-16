@@ -2,8 +2,7 @@
 #
 # Bootstrap the Host to build an Arcade game cab
 
-readonly VAGRANT=$(if [[ -d /vagrant ]]; then true; else false; fi)
-readonly LIBDIR=$(if $VAGRANT; then echo /vagrant/lib; else echo $(dirname $BASH_SOURCE)/../lib; fi)
+readonly LIBDIR=$(if [[ -d /vagrant ]]; then echo /vagrant/lib; else echo $(dirname $BASH_SOURCE)/lib; fi)
 
 source "$LIBDIR/system.sh"
 source "$LIBDIR/utils.sh"
