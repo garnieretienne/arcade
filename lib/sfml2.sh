@@ -2,7 +2,7 @@ source "$(dirname $BASH_SOURCE)/system.sh"
 source "$(dirname $BASH_SOURCE)/utils.sh"
 source "$(dirname $BASH_SOURCE)/deb.sh"
 
-readonly SFML_DEB_URL="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../deb/libsfml_2.1_amd64.deb"
+readonly SFML_DEB_URL="file://$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../deb/libsfml_2.1_amd64.deb"
 readonly SFML_DEV_DEB_URL="file://$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../deb/libsfml-dev_2.1_amd64.deb"
 
 readonly SFML_SRC_URL="http://sfml-dev.org/download/sfml/2.1/SFML-2.1-sources.zip"
