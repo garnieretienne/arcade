@@ -81,6 +81,13 @@ set_grub_resolution() {
   update-grub2
 }
 
+# Configure for how long the grub menu is show at startup
+set_grub_timeout() {
+  local timeout=$1
+  replace_config_line "GRUB_TIMEOUT=" "GRUB_TIMEOUT=0" "/etc/grub/default"
+  update-grub
+}
+
 # Enable splash screen in grub
 enable_grub_splash_screen() {
   replace_config_line "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet\"" "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet splash\"" /etc/default/grub
@@ -110,19 +117,8 @@ setup_x_server() {
   add_config_line "xset -dpms # Turn off power management" /home/$user/.xinitrc
 }
 
-update_compiled_dynamic_library() {
-  ldconfig
-}
-
-setup_system() {
-  local user=$1
-  local keyboard=$2
-  local resolution=$3
-  update_system
-  install_package plymouth-themes-solar # TODO: Replace by a custom theme
-  setup_bootsplash "solar" $resolution
-  create_user $user
-  login_on_startup_user $user
-  setup_x_server $user $resolution $keyboard
-  startx_on_login $user
+# Install and configure alsa
+# TODO: setup default volume on Master
+setup_audio() {
+  install_packages alsa-oss alsa-utils
 }

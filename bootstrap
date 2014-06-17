@@ -16,6 +16,11 @@ readonly SCREEN_RESOLUTION="640x480"
 configure_bootsplash() {
   install_package plymouth-themes-solar
   setup_bootsplash "solar" $SCREEN_RESOLUTION
+  set_grub_timeout 0
+}
+
+configure_audio() {
+  setup_audio
 }
 
 configure_arcade_user() {
@@ -32,6 +37,7 @@ configure_attract_mode() {
 
 main() {
   update_system
+  configure_audio
   configure_bootsplash
   configure_arcade_user
   configure_attract_mode
