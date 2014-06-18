@@ -31,6 +31,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     build_mame = <<-SCRIPT
       cd /vagrant
       source lib/mame.sh
+      update_system
       mame_install_build_dependencies
       mame_download_sources
       mame_compile
@@ -44,12 +45,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   # Host used to build the SFML deb package
-  config.vm.define "build_sfml_package", autostart: false do |sfmldeb|
+  config.vm.define "build_sfml_packages", autostart: false do |sfmldeb|
 
     # Script used to build SFML libraries packages
     build_sfml = <<-SCRIPT
       cd /vagrant
       source lib/sfml2.sh
+      update_system
       sfml_install_build_dependencies
       sfml_download_sources
       sfml_compile
@@ -72,6 +74,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     build_attract = <<-SCRIPT
       cd /vagrant
       source lib/attract.sh
+      update_system
       attract_install_build_dependencies
       attract_download_sources
       attract_compile

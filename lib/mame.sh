@@ -7,7 +7,7 @@ readonly MAME_DEB_URL="file://$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../d
 readonly MAME_SRC_URL="http://mame.mirrors.zippykid.com/releases/mame0153s.zip"
 readonly MAME_VERSION="0.153"
 readonly MAME_SRC_PATH="/usr/local/src/mame_${MAME_VERSION}"
-readonly MAME_BUILD_PATH="/tmp/mame"
+readonly MAME_BUILD_PATH="/tmp/mame_build"
 readonly MAME_BUILD_DEPENDENCIES="build-essential libsdl1.2-dev libsdl-ttf2.0-dev \
     libqt4-dev libfontconfig1-dev libxinerama-dev"
 readonly MAME_DEB_DEPENDENCIES="libasound2 libqtgui4 libsdl1.2debian \
@@ -37,13 +37,30 @@ mame_build_package() {
   declare_debian_package_dependencies mame $MAME_DEB_DEPENDENCIES
   build_debian_package $MAME_BUILD_PATH mame $MAME_VERSION bin/
   mv mame_${MAME_VERSION}_amd64.deb $dst_dir/
-
-  fpm -C $tmp_dir -s dir -t deb --name mame --version $MAME_VERSION --force $dependencies_args --prefix /usr bin/
-  mv mame_${MAME_VERSION}_amd64.deb $dst_dir/
-  rm --recursive $tmp_dir
 }
 
 mame_install_package() {
   install_packages $MAME_DEB_DEPENDENCIES
   install_package_from_url $MAME_DEB_URL mame
+}
+
+# Generate a default `mame.ini` file and display it to stdout
+# Changes in the default mame configuration:
+# * update core output directory path
+# * enable opengl
+# * enable multithreading
+mame_generate_config() {
+  cd /tmp
+  mame -createconfig &> /dev/null
+  replace_config_line "multithreading" "multithreading 1" "/tmp/mame.ini"
+  replace_config_line "video" "video opengl" "/tmp/mame.ini"
+  replace_config_line "cfg_directory" 'cfg_directory $HOME/.mame/cfg' "/tmp/mame.ini"
+  replace_config_line "nvram_directory" 'nvram_directory $HOME/.mame/nvram' "/tmp/mame.ini"
+  replace_config_line "memcard_directory" 'memcard_directory $HOME/.mame/memcard' "/tmp/mame.ini"
+  replace_config_line "input_directory" 'input_directory $HOME/.mame/inp' "/tmp/mame.ini"
+  replace_config_line "state_directory" 'state_directory $HOME/.mame/sta' "/tmp/mame.ini"
+  replace_config_line "snapshot_directory" 'snapshot_directory $HOME/.mame/snap' "/tmp/mame.ini"
+  replace_config_line "diff_directory" 'diff_directory $HOME/.mame/diff' "/tmp/mame.ini"
+  replace_config_line "comment_directory" 'comment_directory $HOME/.mame/comments' "/tmp/mame.ini"
+  cat mame.ini
 }

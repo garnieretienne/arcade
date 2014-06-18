@@ -34,7 +34,7 @@ attract_compile() {
   rm --recursive --force $ATTRACT_BUILD_PATH
   mkdir --parents $ATTRACT_BUILD_PATH/share $ATTRACT_BUILD_PATH/bin
   mv attract $ATTRACT_BUILD_PATH/bin
-  cp --recursive config $ATTRACT_BUILD_PATH/share/attract
+  cp --recursive config/ $ATTRACT_BUILD_PATH/share/attract
 }
 
 attract_build_package() {
@@ -48,4 +48,16 @@ attract_install_package() {
   install_package_from_url $SFML_DEB_URL libsfml
   install_packages $ATTRACT_DEB_DEPENDENCIES
   install_package_from_url $ATTRACT_DEB_URL attract-mode
+}
+
+attract_generate_mame_emulator_config() {
+cat <<'EOF'
+# MAME Arcade emulator
+executable           /usr/bin/mame
+args                 [name]
+rompath              $HOME/arcade/roms
+romext               .zip;.7z;<DIR>
+listxml              mame
+
+EOF
 }

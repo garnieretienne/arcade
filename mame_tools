@@ -1,0 +1,33 @@
+#!/bin/bash
+#
+# Tools manage your mame installation
+
+source "$(dirname $BASH_SOURCE)/lib/system.sh"
+source "$(dirname $BASH_SOURCE)/lib/utils.sh"
+source "$(dirname $BASH_SOURCE)/lib/mame.sh"
+
+readonly HELP=$(cat <<EOF
+  Usage: mame-tool --action
+
+  Actions:
+    --help: display help message
+    --install-package: install the mame package stored in the 'deb/' folder
+    --generate-config: print a configuration file to STDOUT
+EOF
+)
+
+display_help() {
+  echo "$HELP"
+  exit 0
+}
+
+if [[ -z "$1" ]]; then display_help; fi
+
+for command in $@; do
+  if [[ "$command" == "--help" ]]; then display_help; fi
+
+  command_name=$(echo "${command:2}" | tr - _)
+  if [[ "${command:0:2}" == "--" ]]; then
+    mame_$command_name
+  fi
+done

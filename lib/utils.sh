@@ -12,7 +12,7 @@ replace_config_line() {
   local old_line=$1
   local new_line=$2
   local config_file=$3
-  sed -i "s|^${old_line}|${new_line}|g" $config_file
+  sed -i "s|^${old_line}.*\$|${new_line}|g" $config_file
 }
 
 # Add a config line under another line if not already present in the file
