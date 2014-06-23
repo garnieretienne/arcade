@@ -42,7 +42,7 @@ download_and_extract_archive() {
       ;;
     zip)
       local archive_name=$(basename $url)
-      curl --output /tmp/$archive_name $url
+      curl --location --output /tmp/$archive_name $url
       unzip -q /tmp/$archive_name -d $dst
       ;;
   esac
