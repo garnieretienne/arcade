@@ -3,6 +3,7 @@
 # Bootstrap the Host to build an Arcade game cab
 
 readonly LIBDIR=$(if [[ -d /vagrant ]]; then echo /vagrant/lib; else echo $(dirname $BASH_SOURCE)/lib; fi)
+readonly ARTWORK_DIR=$(if [[ -d /vagrant ]]; then echo /vagrant/artwork; else echo $(dirname $BASH_SOURCE)/artwork; fi)
 
 source "$LIBDIR/system.sh"
 source "$LIBDIR/utils.sh"
@@ -10,12 +11,12 @@ source "$LIBDIR/attract.sh"
 
 readonly USER="arcade"
 readonly KEYBOARD="us"
-readonly SCREEN_RESOLUTION="640x480"
+readonly SCREEN_RESOLUTION="1024x768"
+readonly BOOTSPLASH_IMAGE_PATH="$ARTWORK_DIR/bootloader.png"
 
-# TODO: Replace by a custom theme
 configure_bootsplash() {
-  install_package plymouth-themes-solar
-  setup_bootsplash "solar" $SCREEN_RESOLUTION
+  build_plymouth_theme "/usr/share/plymout/themes" "arcade" $BOOTSPLASH_IMAGE_PATH
+  setup_bootsplash "arcade" $SCREEN_RESOLUTION
   set_grub_timeout 0
 }
 

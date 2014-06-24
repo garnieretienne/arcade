@@ -94,6 +94,33 @@ enable_grub_splash_screen() {
   update-grub2
 }
 
+# Create a simple plymouth theme with a simple background image
+# Background image must be a PNG
+build_plymouth_theme() {
+  local plymouth_themes_path=$1
+  local name=$2
+  local background_path=$3
+  mkdir --parents $plymouth_themes_path/$name
+  cp $background_path $plymouth_themes_path/$name/bootsplash.png
+cat > $plymouth_themes_path/$name/$name.plymouth <<PLYMOUTH
+[Plymouth Theme]
+Name=$name
+Description=Arcade bootsplash theme
+ModuleName=script
+[script]
+ImageDir=$plymouth_themes_path/$name
+ScriptFile=$plymouth_themes_path/$name/$name.script
+PLYMOUTH
+cat > $plymouth_themes_path/$name/$name.script <<SCRIPT
+wallpaper_image=Image("bootsplash.png");
+screen_width=Window.GetWidth();
+screen_height=Window.GetHeight();
+resized_wallpaper_image=wallpaper_image.Scale(screen_width,screen_height);
+wallpaper_sprite=Sprite(resized_wallpaper_image);
+wallpaper_sprite.setZ(-100);
+SCRIPT
+}
+
 # Install and configure a splash screen using plymouth
 setup_bootsplash() {
   local plymouth_theme=$1
