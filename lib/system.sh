@@ -95,14 +95,14 @@ set_grub_resolution() {
 set_grub_timeout() {
   local timeout=$1
   echo "Set grub timeout to '$timeout'"
-  replace_config_line "GRUB_TIMEOUT=" "GRUB_TIMEOUT=$timeout" "/etc/grub/default"
+  replace_config_line "GRUB_TIMEOUT=" "GRUB_TIMEOUT=$timeout" "/etc/default/grub"
   update-grub
 }
 
 # Enable splash screen in grub
 enable_grub_splash_screen() {
   echo "Enable splash screen in grub"
-  replace_config_line "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet\"" "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet splash\"" /etc/default/grub
+  replace_config_line "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet\"" "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet splash\"" "/etc/default/grub"
   update-grub2
 }
 
