@@ -35,14 +35,14 @@ download_and_extract_archive() {
   mkdir --parents $dst
   case $ext in
     gz)
-      curl --location $url | tar --extract --gzip --directory $dst
+      curl  --progress-bar --location $url | tar --extract --gzip --directory $dst
       ;;
     bz2)
-      curl --location $url | tar --extract --bzip2 --directory $dst
+      curl  --progress-bar --location $url | tar --extract --bzip2 --directory $dst
       ;;
     zip)
       local archive_name=$(basename $url)
-      curl --location --output /tmp/$archive_name $url
+      curl  --progress-bar --location --output /tmp/$archive_name $url
       unzip -q /tmp/$archive_name -d $dst
       ;;
   esac

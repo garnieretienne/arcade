@@ -21,7 +21,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     arcade.vm.provider("virtualbox"){|vb| vb.gui = true}
 
     # Bootstrap the VM
-    arcade.vm.provision "shell", path: "bootstrap", privileged: true
+    arcade.vm.provision "shell", path: "bootstrap", privileged: true,
+        keep_color: true
   end
 
   # Host used to build the MAME deb package

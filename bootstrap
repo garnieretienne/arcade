@@ -7,6 +7,7 @@ readonly ARTWORK_DIR=$(if [[ -d /vagrant ]]; then echo /vagrant/artwork; else ec
 
 source "$LIBDIR/system.sh"
 source "$LIBDIR/utils.sh"
+source "$LIBDIR/ui.sh"
 source "$LIBDIR/attract.sh"
 
 readonly USER="arcade"
@@ -37,12 +38,18 @@ configure_attract_mode() {
 }
 
 main() {
-  update_system
-  configure_audio
-  configure_bootsplash
-  configure_arcade_user
-  configure_attract_mode
-  reboot
+  echo "Updating the system..." | topic
+  update_system 2> >(warning) | info
+  echo "Configuring audio on the system..." | topic
+  configure_audio 2> >(warning) | info
+  echo "Configuring bootsplash on the system..." | topic
+  configure_bootsplash 2> >(warning) | info
+  echo "Configuring main on the system..." | topic
+  configure_arcade_user 2> >(warning) | info
+  echo "Configuring emulator frontend on the system..." | topic
+  configure_attract_mode 2> >(warning) | info
+  echo "Done." | topic
+  # reboot 2> >(warning) | info
 }
 
 main
