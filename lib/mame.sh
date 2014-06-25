@@ -64,3 +64,7 @@ mame_generate_config() {
   replace_config_line "comment_directory" 'comment_directory $HOME/.mame/comments' "/tmp/mame.ini"
   cat mame.ini
 }
+
+# TODO
+# mame_generate_control_config() {
+# }

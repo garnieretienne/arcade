@@ -102,7 +102,9 @@ set_grub_timeout() {
 # Enable splash screen in grub
 enable_grub_splash_screen() {
   echo "Enable splash screen in grub"
-  replace_config_line "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet\"" "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet splash\"" "/etc/default/grub"
+  replace_config_line "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet\"" \
+    "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet splash\"" \
+    "/etc/default/grub"
   update-grub2
 }
 

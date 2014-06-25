@@ -9,14 +9,19 @@ source "$LIBDIR/system.sh"
 source "$LIBDIR/utils.sh"
 source "$LIBDIR/ui.sh"
 source "$LIBDIR/attract.sh"
+source "$LIBDIR/mame.sh"
 
 readonly USER="arcade"
 readonly KEYBOARD="us"
 readonly SCREEN_RESOLUTION="1024x768"
 readonly BOOTSPLASH_IMAGE_PATH="$ARTWORK_DIR/bootloader.png"
+readonly ATTRACT_CONFIG_PATH="/home/$USER/.attract"
+readonly MAME_CONFIG_PATH="/home/$USER/.mame"
+readonly ARCADE_SHARE_PATH="/usr/share/arcade/arcade"
+
 
 configure_bootsplash() {
-  build_plymouth_theme "/usr/share/plymout/themes" "arcade" $BOOTSPLASH_IMAGE_PATH
+  build_plymouth_theme "/usr/share/plymouth/themes" "arcade" $BOOTSPLASH_IMAGE_PATH
   setup_bootsplash "arcade" $SCREEN_RESOLUTION
   set_grub_timeout 0
 }
@@ -34,22 +39,54 @@ configure_arcade_user() {
 
 configure_attract_mode() {
   attract_install_package
+  mkdir --parents $ATTRACT_CONFIG_PATH
+  mkdir --parents $ATTRACT_CONFIG_PATH/emulators
+  mkdir --parents $ATTRACT_CONFIG_PATH/romlists
+  echo "Generate attract config file"
+  attract_generate_config > $ATTRACT_CONFIG_PATH/attract.cfg
   start_on_startx $USER "attract"
+}
+
+configure_mame() {
+  mame_install_package
+
+  echo "Generate mame config file"
+  mkdir --parents $MAME_CONFIG_PATH
+  mame_generate_config > $MAME_CONFIG_PATH/mame.ini
+  # TODO: mame_generate_control_config
+
+  echo "Generate attract config file for mame emulator"
+  attract_generate_emulator_config "/usr/bin/mame" "[name]" \
+    "$ARCADE_SHARE_PATH/roms" \
+    ".zip;.7z;<DIR>" \
+    "$ARCADE_SHARE_PATH/snapshots" \
+    > $ATTRACT_CONFIG_PATH/emulators/mame.cfg
+  echo "listxml mame" >> $ATTRACT_CONFIG_PATH/emulators/mame.cfg
+
+  echo "Generate attract list entry for the arcade rom list"
+  if ! cat $ATTRACT_CONFIG_PATH/attract.cfg | grep "Arcade" &> /dev/null; then
+    attract_generate_list_config "Arcade" "arcade" >> $ATTRACT_CONFIG_PATH/attract.cfg
+  fi
+
+  echo "Generate the arcade rom list"
+  attract_build_romlist "mame" "arcade" $ATTRACT_CONFIG_PATH
 }
 
 main() {
   echo "Updating the system..." | topic
-  update_system 2> >(warning) | info
+  update_system 2> >(warning) > >(info)
   echo "Configuring audio on the system..." | topic
-  configure_audio 2> >(warning) | info
+  configure_audio 2> >(warning) > >(info)
   echo "Configuring bootsplash on the system..." | topic
-  configure_bootsplash 2> >(warning) | info
-  echo "Configuring main on the system..." | topic
-  configure_arcade_user 2> >(warning) | info
+  configure_bootsplash 2> >(warning) > >(info)
+  echo "Configuring main user on the system..." | topic
+  configure_arcade_user 2> >(warning) > >(info)
   echo "Configuring emulator frontend on the system..." | topic
-  configure_attract_mode 2> >(warning) | info
+  configure_attract_mode 2> >(warning) > >(info)
+  echo "Configuring MAME emulator on the system..." | topic
+  configure_mame 2> >(warning) > >(info)
   echo "Done." | topic
-  # reboot 2> >(warning) | info
+  reboot 2> >(warning) > >(info)
 }
 
 main

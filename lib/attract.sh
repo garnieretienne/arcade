@@ -50,14 +50,87 @@ attract_install_package() {
   install_package_from_url $ATTRACT_DEB_URL attract-mode
 }
 
-attract_generate_mame_emulator_config() {
+# Generate a basic config file for attract mode
+# Inputs:
+# * Up: Up, Joypad #0 Up
+# * Down: Down, Joypad #0 Down
+# * Next Letter: N
+# * Previous Letter: P
+# * Next List: Right, Joypad #0 Right
+# * Previous List: Left, Joypad #0 Left
+# * Select: Return, Joypad #0 Button 0
+# * Exit: Escape
+attract_generate_config() {
 cat <<'EOF'
-# MAME Arcade emulator
-executable           /usr/bin/mame
-args                 [name]
-rompath              $HOME/arcade/roms
-romext               .zip;.7z;<DIR>
-listxml              mame
+sound
+        sound_volume         100
+        ambient_volume       100
+        movie_volume         100
+
+input_map
+        exit                 Escape
+        select               Return
+        configure            Tab
+        up                   Up
+        down                 Down
+        prev_letter          P
+        next_letter          N
+        prev_list            Left
+        next_list            Right
+        up                   Joy0 Up
+        down                 Joy0 Down
+        prev_list            Joy0 Left
+        next_list            Joy0 Right
+        select               Joy0 Button0
+
+general
+        language             en
+        autorotate           none
+        exit_command
+        default_font         FreeSans
+        font_path            /usr/share/fonts/;$HOME/.fonts/
+        screen_saver_timeout 600
+        lists_menu_exit      yes
+        hide_brackets        no
+        autolaunch_last_game no
+        confirm_favourites   yes
+        mouse_threshold      10
+        joystick_threshold   75
+        window_mode          default
 
 EOF
+}
+
+attract_generate_emulator_config() {
+  local cmd=$1
+  local args=$2
+  local rom_path=$3
+  local rom_ext=$4
+  local snapshot_path=$5
+cat <<EOF
+executable           $cmd
+args                 [name]
+rompath              $rom_path
+romext               $rom_ext
+artwork snap         $snapshot_path
+
+EOF
+}
+
+attract_generate_list_config() {
+  local name=$1
+  local filename=$2
+cat <<EOF
+list  $name
+      layout  basic
+      romlist $filename
+
+EOF
+}
+
+attract_build_romlist() {
+  local emulator=$1
+  local file=$2
+  local config_path=$3
+  attract --build-romlist $emulator --output $file --config $config_path
 }
