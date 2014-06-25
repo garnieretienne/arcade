@@ -17,6 +17,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Main arcade host
   config.vm.define "arcade", primary: true do |arcade|
 
+    # Get access to roms sample
+    config.vm.synced_folder "./sample", "/usr/share/arcade"
+
     # Don't boot with headless mode
     arcade.vm.provider("virtualbox"){|vb| vb.gui = true}
 
