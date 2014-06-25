@@ -1,3 +1,5 @@
 deb/*
 !deb/.gitme
+sample/*
+!sample/.gitme
 .vagrant
