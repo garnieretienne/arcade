@@ -169,4 +169,6 @@ setup_audio() {
   amixer set Master unmute
   amixer set PCM 100
   amixer set PCM unmute
+  amixer set Front 100
+  amixer set Front unmute
 }
