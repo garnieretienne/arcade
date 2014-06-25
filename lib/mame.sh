@@ -62,6 +62,7 @@ mame_generate_config() {
   replace_config_line "snapshot_directory" 'snapshot_directory $HOME/.mame/snap' "/tmp/mame.ini"
   replace_config_line "diff_directory" 'diff_directory $HOME/.mame/diff' "/tmp/mame.ini"
   replace_config_line "comment_directory" 'comment_directory $HOME/.mame/comments' "/tmp/mame.ini"
+  replace_config_line "ctrlrpath" 'ctrlrpath $HOME/.mame/ctrlr' "/tmp/mame.ini"
   cat mame.ini
 }
 
