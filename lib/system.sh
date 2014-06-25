@@ -162,8 +162,11 @@ setup_x_server() {
 }
 
 # Install and configure alsa
-# TODO: setup default volume on Master
 setup_audio() {
   echo "Setup audio"
   install_packages alsa-oss alsa-utils
+  amixer set Master 50
+  amixer set Master unmute
+  amixer set PCM 100
+  amixer set PCM unmute
 }
