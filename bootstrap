@@ -19,7 +19,6 @@ readonly ATTRACT_CONFIG_PATH="/home/$USER/.attract"
 readonly MAME_CONFIG_PATH="/home/$USER/.mame"
 readonly ARCADE_SHARE_PATH="/usr/share/arcade/arcade"
 
-
 configure_bootsplash() {
   build_plymouth_theme "/usr/share/plymouth/themes" "arcade" $BOOTSPLASH_IMAGE_PATH
   setup_bootsplash "arcade" $SCREEN_RESOLUTION
@@ -27,7 +26,7 @@ configure_bootsplash() {
 }
 
 configure_audio() {
-  setup_audio
+  setup_audio $USER
 }
 
 configure_arcade_user() {
@@ -50,10 +49,11 @@ configure_attract_mode() {
 configure_mame() {
   mame_install_package
 
-  echo "Generate mame config file"
+  echo "Generate mame config files"
   mkdir --parents $MAME_CONFIG_PATH
-  mame_generate_config > $MAME_CONFIG_PATH/mame.ini
-  # TODO: mame_generate_control_config
+  mkdir --parents $MAME_CONFIG_PATH/cfg
+  mame_generate_config $ARCADE_SHARE_PATH/roms > $MAME_CONFIG_PATH/mame.ini
+  mame_generate_controls_config > $MAME_CONFIG_PATH/cfg/default.cfg
 
   echo "Generate attract config file for mame emulator"
   attract_generate_emulator_config "/usr/bin/mame" "[name]" \
@@ -66,6 +66,8 @@ configure_mame() {
   echo "Generate attract list entry for the arcade rom list"
   if ! cat $ATTRACT_CONFIG_PATH/attract.cfg | grep "Arcade" &> /dev/null; then
     attract_generate_list_config "Arcade" "arcade" >> $ATTRACT_CONFIG_PATH/attract.cfg
+    echo "filter    \"Only Working Games\"" >> $ATTRACT_CONFIG_PATH/attract.cfg
+    echo "           rule    Status equals good" >> $ATTRACT_CONFIG_PATH/attract.cfg
   fi
 
   echo "Generate the arcade rom list"
@@ -75,17 +77,18 @@ configure_mame() {
 main() {
   echo "Updating the system..." | topic
   update_system 2> >(warning) > >(info)
-  echo "Configuring audio on the system..." | topic
-  configure_audio 2> >(warning) > >(info)
   echo "Configuring bootsplash on the system..." | topic
   configure_bootsplash 2> >(warning) > >(info)
   echo "Configuring main user on the system..." | topic
   configure_arcade_user 2> >(warning) > >(info)
+  echo "Configuring audio on the system..." | topic
+  configure_audio 2> >(warning) > >(info)
   echo "Configuring emulator frontend on the system..." | topic
   configure_attract_mode 2> >(warning) > >(info)
   echo "Configuring MAME emulator on the system..." | topic
   configure_mame 2> >(warning) > >(info)
   echo "Done." | topic
+  chown -R $USER:$USER /home/$USER
   reboot 2> >(warning) > >(info)
 }
 

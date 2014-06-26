@@ -71,7 +71,7 @@ start_on_startx() {
 enable_initramfs_modules() {
   local modules=$@
   echo "Add module(s) to be loaded by initramfs: $modules"
-  for module in $modules; do
+  for module in "$@"; do
     add_config_line $module /etc/initramfs-tools/modules
   done
   update-initramfs -u
@@ -141,7 +141,7 @@ setup_bootsplash() {
   local plymouth_theme=$1
   local resolution=$2
   echo "Setup the '$plymouth_theme' bootsplash"
-  install_package plymouth
+  install_packages plymouth plymouth-drm
   /usr/sbin/plymouth-set-default-theme $plymouth_theme
   enable_initramfs_modules "drm" "nouveau modeset=1"
   set_grub_resolution $resolution
@@ -163,12 +163,11 @@ setup_x_server() {
 
 # Install and configure alsa
 setup_audio() {
+  local user=$1
   echo "Setup audio"
-  install_packages alsa-oss alsa-utils
-  amixer set Master 50
-  amixer set Master unmute
-  amixer set PCM 100
-  amixer set PCM unmute
-  amixer set Front 100
-  amixer set Front unmute
+  install_packages alsa-oss alsa-utils oss-compat
+  usermod -a -G audio $user
+  amixer set Master 50% unmute
+  amixer set PCM 100% unmute
+  amixer set Front 100% unmute
 }

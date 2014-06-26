@@ -3,6 +3,7 @@ source "$(dirname $BASH_SOURCE)/utils.sh"
 source "$(dirname $BASH_SOURCE)/deb.sh"
 
 readonly MAME_DEB_URL="file://$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../deb/mame_0.153_amd64.deb"
+readonly MAME_FILES_DIR=$(echo $(dirname $BASH_SOURCE)/../files/mame)
 
 readonly MAME_SRC_URL="http://mame.mirrors.zippykid.com/releases/mame0153s.zip"
 readonly MAME_VERSION="0.153"
@@ -50,6 +51,7 @@ mame_install_package() {
 # * enable opengl
 # * enable multithreading
 mame_generate_config() {
+  local rom_path=$1
   cd /tmp
   mame -createconfig &> /dev/null
   replace_config_line "multithreading" "multithreading 1" "/tmp/mame.ini"
@@ -63,9 +65,10 @@ mame_generate_config() {
   replace_config_line "diff_directory" 'diff_directory $HOME/.mame/diff' "/tmp/mame.ini"
   replace_config_line "comment_directory" 'comment_directory $HOME/.mame/comments' "/tmp/mame.ini"
   replace_config_line "ctrlrpath" 'ctrlrpath $HOME/.mame/ctrlr' "/tmp/mame.ini"
+  replace_config_line "rompath" "rompath $rom_path" "/tmp/mame.ini"
   cat mame.ini
 }
 
-# TODO
-# mame_generate_control_config() {
-# }
+mame_generate_controls_config() {
+  cat $MAME_FILES_DIR/default.cfg
+}
