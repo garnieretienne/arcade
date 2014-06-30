@@ -3,7 +3,7 @@ source "$(dirname $BASH_SOURCE)/utils.sh"
 source "$(dirname $BASH_SOURCE)/deb.sh"
 
 readonly MAME_DEB_URL="file://$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../deb/mame_0.153_amd64.deb"
-readonly MAME_FILES_DIR=$(echo $(dirname $BASH_SOURCE)/../files/mame)
+readonly MAME_FILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../files/mame"
 
 readonly MAME_SRC_URL="http://mame.mirrors.zippykid.com/releases/mame0153s.zip"
 readonly MAME_VERSION="0.153"
@@ -48,6 +48,7 @@ mame_install_package() {
 # Generate a default `mame.ini` file and display it to stdout
 # Changes in the default mame configuration:
 # * update core output directory path
+# * update rom path
 # * enable opengl
 # * enable multithreading
 mame_generate_config() {
