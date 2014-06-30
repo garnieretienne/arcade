@@ -47,3 +47,8 @@ You can use the `vagrant up build_mame_package` command to create a debian
 package for mame in `deb/`.
 
 __Note: This can take a long time to compile, like many hours.__
+
+# Artwork
+
+* Bootloader image: Bad Company by Kaiseto
+  http://kaiseto.deviantart.com/art/Bad-Company-128055448
