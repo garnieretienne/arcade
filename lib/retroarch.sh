@@ -25,7 +25,7 @@ retroarch_download_sources() {
 
 retroarch_compile() {
   cd $RETROARCH_SRC_PATH
-  ./configure --enable-sdl --enable-threads --enable-alsa --prefix=/
+  ./configure --enable-sdl --enable-threads --enable-alsa --enable-zlib --prefix=/
   make
   make DESTDIR=$RETROARCH_BUILD_PATH install
 }

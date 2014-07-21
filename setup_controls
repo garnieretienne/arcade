@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# Script used to generate joystick controls file for retroarch
+
+if [ -z $1 ]; then
+  echo "Usage: ./setup_controls [PLAYER_N#] [JOYSTICK_N#]"
+  exit
+end
+
+echo "Configure joypad for player #${1} using joystick #${2}..."
+retroarch-joyconfig --timeout 4 --autoconfig ~/.retroarch/controls/player_${1}.cfg  --player $1 --joypad $2
+if [ "$1" -eq "1" ]; then
+  echo "Adding pressing 'Select' + 'Start' to exit the game"
+  select_input=$(cat ~/.retroarch/controls/player_${1}.cfg | grep "select" | cut -d '"' -f 2)
+  start_input=$(cat ~/.retroarch/controls/player_${1}.cfg | grep "start" | cut -d '"' -f 2)
+  echo "Exit game: ${select_input} + ${start_input}"
+  echo "input_enable_hotkey_btn = \"${select_input}\"" >> ~/.retroarch/retroarch.cfg
+  echo "input_exit_emulator_btn = \"${start_input}\"" >> ~/.retroarch/controls/player_${1}.cfg
+fi
+echo "Done."
