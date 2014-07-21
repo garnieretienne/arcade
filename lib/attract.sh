@@ -109,7 +109,7 @@ attract_generate_emulator_config() {
   local snapshot_path=$5
 cat <<EOF
 executable           $cmd
-args                 [name]
+args                 $args
 rompath              $rom_path
 romext               $rom_ext
 artwork snap         $snapshot_path

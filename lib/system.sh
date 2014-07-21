@@ -7,8 +7,9 @@ update_system() {
 
 # Restart the system
 reboot() {
-  echo "Restart the system"
-  shutdown -r now
+  echo "You can now reboot the system"
+  # echo "Restart the system"
+  # shutdown -r now
 }
 
 # Install a list a packages using apt-get

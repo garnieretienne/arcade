@@ -14,6 +14,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Get access to sources
   config.vm.synced_folder ".", "/vagrant"
 
+  # Default VM use 'mirrors.kernel.org' as main address but it's damn slow or
+  # offline at my location. Replace with 'ftp.debian.org' address.
+  replace_source_url = <<-SCRIPT
+cat > /etc/apt/sources.list <<-APT
+  deb http://ftp.debian.org/debian wheezy main
+  deb-src http://ftp.debian.org/debian wheezy main
+  deb http://security.debian.org/ wheezy/updates main
+  deb-src http://security.debian.org/ wheezy/updates main
+  deb http://ftp.debian.org/debian wheezy-updates main
+  deb-src http://ftp.debian.org/debian wheezy-updates main
+APT
+  SCRIPT
+
   # Main arcade host
   config.vm.define "arcade", primary: true do |arcade|
 
@@ -24,6 +37,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     arcade.vm.provider("virtualbox"){|vb| vb.gui = true}
 
     # Bootstrap the VM
+    arcade.vm.provision "shell", inline: replace_source_url, privileged: true
     arcade.vm.provision "shell", path: "bootstrap", privileged: true,
         keep_color: true
   end
@@ -45,6 +59,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     SCRIPT
 
     # Download, compile and package MAME
+    mamedeb.vm.provision "shell", inline: replace_source_url, privileged: true
     mamedeb.vm.provision "shell", inline: build_mame, privileged: true
   end
 
@@ -68,6 +83,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     SCRIPT
 
     # Download, compile and package SFML
+    sfmldeb.vm.provision "shell", inline: replace_source_url, privileged: true
     sfmldeb.vm.provision "shell", inline: build_sfml, privileged: true
   end
 
@@ -88,6 +104,49 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     SCRIPT
 
     # Download, compile and package attract-mode
+    attractdeb.vm.provision "shell", inline: replace_source_url, privileged: true
     attractdeb.vm.provision "shell", inline: build_attract, privileged: true
+  end
+
+  # Host used to build the retroarch deb package
+  config.vm.define "build_retroarch_package", autostart: false do |retroarchdeb|
+
+    # Script used to build the retroarch package
+    build_retroarch = <<-SCRIPT
+      cd /vagrant
+      source lib/retroarch.sh
+      update_system
+      retroarch_install_build_dependencies
+      retroarch_download_sources
+      retroarch_compile
+      retroarch_build_package /vagrant/deb
+      echo ""
+      echo "Retroarch debian package created ('deb/$(ls /vagrant/deb/ | grep retroarch)')"
+    SCRIPT
+
+    # Download, compile and package attract-mode
+    retroarchdeb.vm.provision "shell", inline: replace_source_url, privileged: true
+    retroarchdeb.vm.provision "shell", inline: build_retroarch, privileged: true
+  end
+
+  # Host used to build the snes9x deb package
+  config.vm.define "build_snes9x_package", autostart: false do |snes9xdeb|
+
+    # Script used to build the snes9x package
+    build_snes9x = <<-SCRIPT
+      cd /vagrant
+      source lib/snes9x.sh
+      update_system
+      snes9x_install_build_dependencies
+      snes9x_download_sources
+      snes9x_compile
+      snes9x_build_package /vagrant/deb
+      echo ""
+      echo "Libretro SNES9X core debian package created ('deb/$(ls /vagrant/deb/ | grep snes9x)')"
+    SCRIPT
+
+    # Download, compile and package snes9x
+    snes9xdeb.vm.provision "shell", inline: replace_source_url, privileged: true
+    snes9xdeb.vm.provision "shell", inline: build_snes9x, privileged: true
   end
 end

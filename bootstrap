@@ -10,6 +10,8 @@ source "$LIBDIR/utils.sh"
 source "$LIBDIR/ui.sh"
 source "$LIBDIR/attract.sh"
 source "$LIBDIR/mame.sh"
+source "$LIBDIR/retroarch.sh"
+source "$LIBDIR/snes9x.sh"
 
 readonly USER="arcade"
 readonly KEYBOARD="us"
@@ -18,6 +20,8 @@ readonly BOOTSPLASH_IMAGE_PATH="$ARTWORK_DIR/bootloader.png"
 readonly ATTRACT_CONFIG_PATH="/home/$USER/.attract"
 readonly MAME_CONFIG_PATH="/home/$USER/.mame"
 readonly ARCADE_SHARE_PATH="/usr/share/arcade/arcade"
+readonly SNES_SHARE_PATH="/usr/share/arcade/snes"
+readonly RETROARCH_CONFIG_PATH="/home/$USER/.retroarch"
 
 configure_bootsplash() {
   build_plymouth_theme "/usr/share/plymouth/themes" "arcade" $BOOTSPLASH_IMAGE_PATH
@@ -74,6 +78,36 @@ configure_mame() {
   attract_build_romlist "mame" "arcade" $ATTRACT_CONFIG_PATH
 }
 
+configure_retroarch() {
+  retroarch_install_package
+
+  echo "Generate retroarch config file"
+  mkdir --parents $RETROARCH_CONFIG_PATH
+  mkdir --parents $RETROARCH_CONFIG_PATH/savefile
+  mkdir --parents $RETROARCH_CONFIG_PATH/savestate
+  retroarch_generate_config > $RETROARCH_CONFIG_PATH/retroarch.cfg
+}
+
+configure_snes9x() {
+  snes9x_install_package
+
+  echo "Generate attract config file for snes9x emulator"
+  attract_generate_emulator_config "/usr/bin/retroarch" \
+    "\"[romfilename]\" --libretro /usr/lib/snes9x_libretro.so --config $RETROARCH_CONFIG_PATH/retroarch.cfg" \
+    "$SNES_SHARE_PATH/roms" \
+    ".sfc" \
+    "$SNES_SHARE_PATH/snapshots" \
+    > $ATTRACT_CONFIG_PATH/emulators/snes9x.cfg
+
+  echo "Generate attract list entry for the snes rom list"
+  if ! cat $ATTRACT_CONFIG_PATH/attract.cfg | grep "SNES" &> /dev/null; then
+    attract_generate_list_config "SNES" "snes" >> $ATTRACT_CONFIG_PATH/attract.cfg
+  fi
+
+  echo "Generate the snes rom list"
+  attract_build_romlist "snes9x" "snes" $ATTRACT_CONFIG_PATH
+}
+
 main() {
   echo "Updating the system..." | topic
   update_system 2> >(warning) > >(info)
@@ -85,8 +119,11 @@ main() {
   configure_audio 2> >(warning) > >(info)
   echo "Configuring emulator frontend on the system..." | topic
   configure_attract_mode 2> >(warning) > >(info)
-  echo "Configuring MAME emulator on the system..." | topic
+  echo "Configuring the Arcade emulator (MAME) on the system..." | topic
   configure_mame 2> >(warning) > >(info)
+  echo "Configuring the SNES emulator (Retroarch + SNES9X core) on the system..." | topic
+  configure_retroarch 2> >(warning) > >(info)
+  configure_snes9x 2> >(warning) > >(info)
   echo "Done." | topic
   chown -R $USER:$USER /home/$USER
   reboot 2> >(warning) > >(info)
