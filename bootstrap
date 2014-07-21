@@ -95,7 +95,7 @@ configure_snes9x() {
   attract_generate_emulator_config "/usr/bin/retroarch" \
     "\"[romfilename]\" --libretro /usr/lib/snes9x_libretro.so --config $RETROARCH_CONFIG_PATH/retroarch.cfg" \
     "$SNES_SHARE_PATH/roms" \
-    ".sfc" \
+    ".zip;.sfc" \
     "$SNES_SHARE_PATH/snapshots" \
     > $ATTRACT_CONFIG_PATH/emulators/snes9x.cfg
 
